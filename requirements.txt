@@ -1,0 +1,9 @@
+﻿streamlit
+pandas
+numpy
+pillow
+requests
+torch
+transformers
+scikit-learn
+beautifulsoup4
