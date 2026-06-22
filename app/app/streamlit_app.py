@@ -14,7 +14,7 @@ from transformers import AutoProcessor, CLIPModel
 
 
 st.set_page_config(
-    page_title="F$AHION $YNC",
+    page_title="FA$HION $YNC",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -486,7 +486,7 @@ show_html(
         <div class="hero-inner">
             <div class="hero-kicker">A Demo For Fashion Future</div>
             <div class="hero-title">
-                <div class="hero-main-text">F$AHION</div>
+                <div class="hero-main-text">FA$HION</div>
                 <div class="hero-sync-text">$YNC</div>
             </div>
             <div class="hero-copy">
