@@ -95,7 +95,7 @@ if len(products_df) != len(product_embeddings):
 clip_model, clip_processor = load_clip()
 
 search_model = NearestNeighbors(
-    n_neighbors=min(3, len(products_df)),
+    n_neighbors=min(6, len(products_df)),
     metric="cosine",
 )
 search_model.fit(product_embeddings)
@@ -114,7 +114,7 @@ def get_image_embedding(image):
     return image_features.squeeze().cpu().numpy()
 
 
-def find_similar_products(image, n_results=3):
+def find_similar_products(image, n_results=6):
     query_embedding = get_image_embedding(image).reshape(1, -1)
     distances, indices = search_model.kneighbors(
         query_embedding,
@@ -600,7 +600,7 @@ if selected_image is None:
     )
 else:
     with st.spinner("Finding similar pieces..."):
-        results = find_similar_products(selected_image, n_results=3)
+        results = find_similar_products(selected_image, n_results=6)
 
     left_col, right_col = st.columns([0.95, 1.65])
 
@@ -609,29 +609,30 @@ else:
         st.image(selected_image, use_container_width=True)
 
     with right_col:
-        show_html('<div class="image-caption">Closest matches</div>')
-        result_cols = st.columns(3)
+        show_html('<div class="image-caption">Closest Matches</div>')
 
-        for col, (_, row) in zip(result_cols, results.iterrows()):
-            with col:
-                st.image(row["image_url"], use_container_width=True)
+        for start in range(0, len(results), 3):
+            row_results = results.iloc[start:start + 3]
+            result_cols = st.columns(3)
 
-                distance_value = float(row["distance"])
-                similarity_score = max(0, min(100, round((1 - distance_value) * 100)))
-                price_text = format_price(row["price_egp"])
+            for col, (_, row) in zip(result_cols, row_results.iterrows()):
+                with col:
+                    st.image(row["image_url"], use_container_width=True)
 
-                show_html(
-                    f"""
-                    <div class="product-name">{row["product_name"]}</div>
-                    <div class="product-meta">{row["store_name"]}</div>
-                    <div class="product-meta">{price_text}</div>
-                    <div class="similarity">Similarity: {similarity_score}%</div>
-                    """
-                )
+                    distance_value = float(row["distance"])
+                    similarity_score = max(0, min(100, round((1 - distance_value) * 100)))
+                    price_text = format_price(row["price_egp"])
 
-                if pd.notna(row["product_url"]):
-                    st.link_button("Open product", row["product_url"])
+                    product_name = str(row["product_name"]).upper()
+                    store_name = str(row["store_name"]).upper()
 
+                    st.markdown(f"**{product_name}**")
+                    st.caption(store_name)
+                    st.caption(price_text)
+                    st.caption(f"SIMILARITY: {similarity_score}%")
+
+                    if pd.notna(row["product_url"]):
+                        st.link_button("OPEN PRODUCT", row["product_url"], use_container_width=True)
 
 # =========================
 # ABOUT SECTION
